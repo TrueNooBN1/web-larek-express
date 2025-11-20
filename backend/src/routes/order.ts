@@ -10,6 +10,5 @@ const orderRouteValidator = celebrate({
 });
 
 router.post('/', orderRouteValidator, postOrder);
-// router.post('/', postOrder);
 
 export {router as orderRouter};

@@ -5,12 +5,12 @@ import mongoose from "mongoose";
 //   "неглавное"
 // }
 
-interface IImage{
+export interface IImage{
   fileName: string;
   originalName: string;
 }
 
-interface IProduct{
+export interface IProduct{
   title: string;
   image: IImage;
   category?: string;

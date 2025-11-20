@@ -1,12 +1,12 @@
 import express from "express"
-import { MongoClient } from 'mongodb';
 import cors from 'cors';
 import { productsRouter } from "./routes/product";
 import {PORT, DB_ADDRESS} from "./config"
 import mongoose from "mongoose";
 import { orderRouter } from "./routes/order";
-import { error } from "console";
 import { errors } from "celebrate";
+import { errorHandler } from "./middlewares/error-handler";
+import { errorLogger, requestLogger } from "./middlewares/logger";
 
 const path = require('path');
 
@@ -19,22 +19,25 @@ if (!PORT) {
  
 mongoose.connect(DB_ADDRESS);
 const app = express();
+
+//настройка логгирования и мидлваров для парса данных
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
+app.use(requestLogger)
 
+//настройка роутов и статик директории с файлами
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/product', productsRouter);
 app.use('/order', orderRouter);
 
-app.use(express.static(path.join(__dirname, 'public')));
-
+//настройка мидлваров для обработки и логгирования ошибок
+app.use(errorLogger)
+app.use(errorHandler);
 app.use(errors())
 
+//run server
 app.listen(+PORT, async ()=>{
-  try{
-    console.log(`App listening on port ${PORT}`);
-    console.log(`DB connected on address ${DB_ADDRESS}`)
-  }catch(err){
-    console.log("DB not connected, error->", err)
-  }
+  console.log(`App listening on port ${PORT}`);
+  console.log(`DB connected on address ${DB_ADDRESS}`)
 });

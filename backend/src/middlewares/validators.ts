@@ -34,7 +34,7 @@ export const orderSchema = Joi.object({
   address: Joi.string()
     .required()
     .messages({
-      "any.required": "addres required"
+      "any.required": "address required"
     }),
 
   total: Joi.number()

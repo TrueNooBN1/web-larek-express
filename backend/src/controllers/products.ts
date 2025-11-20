@@ -1,54 +1,38 @@
-import { Request, Response } from 'express';
-import product from '../models/product';
+import { NextFunction, Request, Response } from 'express';
+import product, { IProduct } from '../models/product';
+import ServerError from '../errors/server-error';
+import ConflictError from '../errors/conflict-error';
+import BadRequestError from '../errors/bad-request-error';
 
-export const getProducts = (req: Request, res: Response) => {
+export const getProducts = (req: Request, res: Response, next: NextFunction) => {
   console.log("getProducts");
-  try{
-    return product.find({})
-    .then((products)=>{
-      res.status(200).send({"items": products, "total": products.length});
-    })
-    .catch((err)=>{
-      console.log(err);
-      res.status(500).send({
-        "message": "ошибка по умолчанию"
-      });
-    })
-  }catch(err){
-      res.status(500).send({
-        "message": "ошибка по умолчанию"
-      });
+  return product.find({})
+  .then((products)=>{
+    res.status(200).send({"items": products, "total": products.length});
+  })
+  .catch((err)=>{
     console.log(err);
-  }
+    return next(new ServerError(`DB error->${err.code}`));
+  })
 };
-export const postProduct = (req: Request, res: Response) => {
+
+export const postProduct = (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
-  const newProduct = body; 
-  console.log("postProduct", body);
-  try{
-    return product.create(newProduct)
-    .then((product)=>{
-      res.status(201).send(product);
-    })
-    .catch((err)=>{
-      console.log("postProduct DB error->", err);
-      if(err.code === 11000){
-        res.status(409).send({
-          "message": "Продукт с таким названием уже есть в системе"
-        });
-      }else{
-        res.status(500).send({
-          "message": "ошибка по умолчанию"
-        });
-      }
-    res.status(500).send({
-      "message": "ошибка по умолчанию"
-    });
-    })
-  }catch(err){
-      console.log("postProduct error->", err);
-    res.status(500).send({
-      "message": "ошибка по умолчанию"
-    });
-  }
+  const newProduct : IProduct = body;
+
+  if(newProduct === undefined || newProduct === null)
+    return next(new BadRequestError("product required in body"))
+
+  console.log(newProduct);
+  return product.create(newProduct)
+  .then((product)=>{
+    res.status(201).send(product);
+  })
+  .catch((err)=>{
+    if(err.code === 11000){
+      return next(new ConflictError("Продукт с таким названием уже есть в системе"));
+    }else{
+      return next(new BadRequestError("Переданы некорректные данные при создании товара"));
+    }
+  })
 };
