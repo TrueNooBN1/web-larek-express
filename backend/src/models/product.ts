@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
-enum Categories{
-  "главное",
-  "неглавное"
-}
+// enum Categories{
+//   "главное",
+//   "неглавное"
+// }
 
 interface IImage{
-  filename: string;
+  fileName: string;
   originalName: string;
 }
 
@@ -19,28 +19,28 @@ interface IProduct{
 }
 
 const imageSchema = new mongoose.Schema<IImage>({
-  filename:{
+  fileName:{
     type: String,
-    required: true,
+    required: [true, 'Поле fileName должно быть заполнено'],
   },
   originalName:{
     type: String,
-    required: true,
+    required: [true, 'Поле originalName должно быть заполнено'],
   }
 });
 
 const productSchema = new mongoose.Schema<IProduct>({
-  title:{
+ title: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30
-  },
+    unique: true,
+    required: [true, 'Поле "title" должно быть заполнено'],
+    minlength: [2, 'Минимальная длина поля "title" - 2'],
+    maxlength: [30, 'Максимальная длина поля "title" - 30'],
+  }, 
   image: imageSchema,
   category:{
     type: String,
     required: false,
-    enum: Object.values(Categories)
   },
   description:{
     type: String,
@@ -51,6 +51,8 @@ const productSchema = new mongoose.Schema<IProduct>({
     required: false,
   }
 });
+
+productSchema.index({ title: 1 }, { unique: true });
 
 
 export default mongoose.model<IProduct>('product', productSchema); 
