@@ -5,7 +5,6 @@ import ConflictError from '../errors/conflict-error';
 import BadRequestError from '../errors/bad-request-error';
 
 export const getProducts = (req: Request, res: Response, next: NextFunction) => {
-  console.log("getProducts");
   return product.find({})
   .then((products)=>{
     res.status(200).send({"items": products, "total": products.length});

@@ -7,14 +7,14 @@ import { orderRouter } from "./routes/order";
 import { errors } from "celebrate";
 import { errorHandler } from "./middlewares/error-handler";
 import { errorLogger, requestLogger } from "./middlewares/logger";
+import { authRouter } from "./routes/auth";
+
+const cookieParser = require('cookie-parser')
 
 const path = require('path');
 
 if (!DB_ADDRESS) {
     throw new Error('DB_ADDRESS environment variable is required');
-}
-if (!PORT) {
-    throw new Error('PORT environment variable is required');
 }
  
 mongoose.connect(DB_ADDRESS);
@@ -23,6 +23,7 @@ const app = express();
 //настройка логгирования и мидлваров для парса данных
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser())
 app.use(cors());
 app.use(requestLogger)
 
@@ -30,6 +31,7 @@ app.use(requestLogger)
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/product', productsRouter);
 app.use('/order', orderRouter);
+app.use('/auth', authRouter);
 
 //настройка мидлваров для обработки и логгирования ошибок
 app.use(errorLogger)
