@@ -44,8 +44,8 @@ app.use('/upload', uploadRouter);
 
 // настройка мидлваров для обработки и логгирования ошибок
 app.use(errorLogger);
-app.use(errorHandler);
 app.use(errors());
+app.use(errorHandler);
 startCleanupJob();
 // run server
 app.listen(+PORT, async () => {

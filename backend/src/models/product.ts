@@ -18,7 +18,7 @@ export interface IProduct{
   image: IImage;
   category?: string;
   description?: string;
-  price?: string | null;
+  price?: number | null;
 }
 
 const imageSchema = new mongoose.Schema<IImage>({
@@ -40,10 +40,13 @@ const productSchema = new mongoose.Schema<IProduct>({
     minlength: [2, 'Минимальная длина поля "title" - 2'],
     maxlength: [30, 'Максимальная длина поля "title" - 30'],
   },
-  image: imageSchema,
+  image: {
+    type: imageSchema,
+    required: [true, 'Поле "image" должно быть заполнено'],
+  },
   category: {
     type: String,
-    required: false,
+    required: [true, 'Поле "category" должно быть заполнено'],
   },
   description: {
     type: String,

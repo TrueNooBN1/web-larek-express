@@ -17,27 +17,33 @@ export const getProducts = (_req: Request, res: Response, next: NextFunction) =>
 export const postProduct = (req: Request, res: Response, next: NextFunction) => {
   const { body } = req;
   const newProduct : IProduct = body;
+  console.log(newProduct);
 
   if (newProduct === undefined || newProduct === null) { return next(new BadRequestError('product required in body')); }
 
   if (newProduct.image) {
     const fullPath = path.join(publicPath, newProduct.image.fileName);
-    const newPath = path.join(publicPath, 'images', newProduct.image.originalName);
-    newProduct.image.fileName = `/images/${newProduct.image.originalName}`;
-    fs.rename(fullPath, newPath)
+    fs.access(fullPath)
       .then(() => {
+        const newPath = path.join(publicPath, 'images', newProduct.image.originalName);
+        newProduct.image.fileName = `/images/${newProduct.image.originalName}`;
+        fs.rename(fullPath, newPath)
+          .then(() => {
+          })
+          .catch(() => next(new BadRequestError('Incorrect fileName')));
       })
-      .catch(() => next(new BadRequestError('Incorrect fileName')));
+      .catch(() => {});
   }
 
   return product.create(newProduct)
-    .then(() => {
-      res.status(201).send(product);
+    .then((dbProduct) => {
+      res.status(201).send({ ...newProduct, _id: dbProduct._id });
     })
     .catch((err) => {
       if (err.code === 11000) {
         return next(new ConflictError('Продукт с таким названием уже есть в системе'));
       }
+      console.log(err);
       return next(new BadRequestError('Переданы некорректные данные при создании товара'));
     });
 };
@@ -59,7 +65,7 @@ export const patchProduct = (req: Request, res: Response, next: NextFunction) =>
   }
   return product.findByIdAndUpdate({ _id: productId }, body, { new: true })
     .then(() => {
-      res.status(201).send(product);
+      res.status(201).send({ ...product, _id: productId });
     })
     .catch((err) => {
       if (err.code === 11000) {
