@@ -26,6 +26,6 @@ export const logsDir = path.join(__dirname, 'logs');
 if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
 }
-
-
+export const publicPath = path.join(__dirname, "public");
+export const uploadPath = path.join(__dirname, "public", "temp");
 

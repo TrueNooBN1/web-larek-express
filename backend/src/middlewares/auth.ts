@@ -24,7 +24,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
 
   try{
     const decoded = jwt.verify(token, String(JWT_ACCES_KEY)) as JwtPayload;
-    console.log(decoded._id);
+    // console.log(decoded._id);
     req.body.userId = decoded._id;
     next();
   } catch (error) {

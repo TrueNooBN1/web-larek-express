@@ -6,7 +6,7 @@ import ServerError from '../errors/server-error';
 
 export const postOrder = (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
-    console.log("Post order", body);
+    // console.log("Post order", body);
 
     const order = body;
     const items = order.items;
@@ -25,8 +25,8 @@ export const postOrder = (req: Request, res: Response, next: NextFunction) => {
 
       let totalPrice = findedItems.reduce((sum, current)=>sum + Number(current.price), 0)
       if(totalPrice != order.total){
-        console.log(totalPrice ,order.total);
-        console.log(findedItems);
+        // console.log(totalPrice ,order.total);
+        // console.log(findedItems);
         return next(new BadRequestError("totalPrice != price"));
       }
 

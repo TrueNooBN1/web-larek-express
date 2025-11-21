@@ -11,7 +11,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction)=>{
   
-  console.log("errrorHandler");
+  console.log("errorHandler");
   console.log(error);
 
   if (error instanceof ConflictError || 

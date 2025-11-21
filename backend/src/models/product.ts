@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
+import fs from "fs/promises"
 
 // enum Categories{
 //   "главное",
 //   "неглавное"
 // }
+
+const path = require('path')
 
 export interface IImage{
   fileName: string;
@@ -49,6 +52,28 @@ const productSchema = new mongoose.Schema<IProduct>({
   price:{
     type: Number,
     required: false,
+  }
+});
+
+const deleteProductFiles = (product: IProduct)=> {
+  const filesToDelete: string[] = [];
+
+  if (!product.image.fileName) {
+    return;
+  }
+  
+  const fullPath = path.join(__dirname, '../public', product.image.fileName);
+  console.log(fullPath);
+  fs.unlink(fullPath)
+  .then(()=>{
+  })
+  .catch ((err)=>{
+  })
+};
+
+productSchema.post('findOneAndDelete', async function(product: IProduct) {
+  if (product) {
+    await deleteProductFiles(product);
   }
 });
 

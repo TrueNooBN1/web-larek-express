@@ -44,7 +44,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const register = (req: Request, res: Response, next: NextFunction) => {
-  console.log("register incomming");
+  // console.log("register incomming");
   const { email, password, name } = req.body;
   return bcrypt.hash(password, 10)
   .then((hash)=>{
@@ -66,7 +66,7 @@ export const register = (req: Request, res: Response, next: NextFunction) => {
       })
     })
     .catch(err=>{
-      console.log(err.code);
+      // console.log(err.code);
       if(err.code === 11000){
         next(new ConflictError("Пользователь с таким именем уже зарегестрирован"));
       }
@@ -86,7 +86,7 @@ export const getToken = (req: Request, res: Response, next: NextFunction) => {
   })
   .then(user=>{
     if(user === null)
-      return next(new BadRequestError("токен не найден"));
+      return next(new UnauthorizedError("токен не найден"));
     
     const {accessToken, refreshToken} = generateTokens(String(user._id));
     user!.tokens = [accessToken, refreshToken];
@@ -104,7 +104,7 @@ export const getToken = (req: Request, res: Response, next: NextFunction) => {
     })
   })
   .catch(err=>{
-    console.log(err);
+    // console.log(err);
     next(new ServerError("Ошибка сервера"));
   })
 }
@@ -132,21 +132,21 @@ export const logout = (req: Request, res: Response, next: NextFunction) => {
     })
   })
   .catch(err=>{
-    console.log(err);
+    // console.log(err);
     next(new ServerError("Ошибка сервера"));
   })
 }
 
 export const getUser = (req: Request, res: Response, next: NextFunction) => {
   const authorization = req.headers.authorization;
-  console.log(authorization);
+  // console.log(authorization);
   const token = authorization!.split(' ')[1];
 
   return user.findOne({
     _id: req.body.userId
   })
   .then(user=>{
-    console.log(user);
+    // console.log(user);
     if(!user)
       next(new NotFoundError("Пользователь не найден"));
     res.status(200).send({
