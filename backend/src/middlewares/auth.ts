@@ -14,19 +14,19 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    next(new UnauthorizedError('Authorization header is required'));
+    return next(new UnauthorizedError('Authorization header is required'));
   }
 
   const token = authHeader!.split(' ')[1];
   if (!token) {
-    next(new UnauthorizedError('Access token is required'));
+    return next(new UnauthorizedError('Access token is required'));
   }
 
   try{
     const decoded = jwt.verify(token, String(JWT_ACCES_KEY)) as JwtPayload;
     // console.log(decoded._id);
     req.body.userId = decoded._id;
-    next();
+    return next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return next(new UnauthorizedError('Access token expired'));
@@ -36,7 +36,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
       return next(new UnauthorizedError('Invalid access token'));
     }
     
-    next(error);
+    return next(error);
   }
 };
 

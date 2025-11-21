@@ -14,11 +14,11 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   return user.findOne({ email }).select("+password")
   .then((user) => {
     if (!user) {
-      next(new UnauthorizedError('Неправильные почта или пароль'))
+      return next(new UnauthorizedError('Неправильные почта или пароль'))
     }
     return bcrypt.compare(password, user!.password).then((matched) => {
       if (!matched) {
-        next(new UnauthorizedError('Неправильные почта или пароль'))
+        return next(new UnauthorizedError('Неправильные почта или пароль'))
       }
 
       const {accessToken, refreshToken} = generateTokens(String(user!._id));
@@ -39,7 +39,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
     });
   })
   .catch((error)=>{
-    next(new UnauthorizedError('Неправильные почта или пароль'))
+    return next(new UnauthorizedError('Неправильные почта или пароль'))
   })
 }
 
@@ -68,9 +68,9 @@ export const register = (req: Request, res: Response, next: NextFunction) => {
     .catch(err=>{
       // console.log(err.code);
       if(err.code === 11000){
-        next(new ConflictError("Пользователь с таким именем уже зарегестрирован"));
+        return next(new ConflictError("Пользователь с таким именем уже зарегестрирован"));
       }
-      next(new BadRequestError("Ошибка при добавлении"));
+      return next(new BadRequestError("Ошибка при добавлении"));
     })
   })
 }
@@ -92,7 +92,7 @@ export const getToken = (req: Request, res: Response, next: NextFunction) => {
     user!.tokens = [accessToken, refreshToken];
     user?.save()
     .then(()=>{
-      setExpiredCookieObj(res, refreshToken.token);
+      setCookieObj(res, refreshToken.token);
       res.status(200).send({
         user:{
           email: user.email,
@@ -105,22 +105,24 @@ export const getToken = (req: Request, res: Response, next: NextFunction) => {
   })
   .catch(err=>{
     // console.log(err);
-    next(new ServerError("Ошибка сервера"));
+    return next(new ServerError("Ошибка сервера"));
   })
 }
 
 export const logout = (req: Request, res: Response, next: NextFunction) => {
   const refreshToken = req.cookies.refreshToken;
+  console.log(refreshToken);
   return user.findOne({
-    "tokens": {
-      "$elemMatch": {
+    tokens: {
+      $elemMatch: {
         token: refreshToken
       }
     }
   })
   .then(user=>{
+    console.log("user is " + user);
     if(user === null)
-      next(new BadRequestError("токен не найден"));
+      return next(new UnauthorizedError("токен не найден"));
     
     user!.tokens = [];
     user?.save()
@@ -133,13 +135,13 @@ export const logout = (req: Request, res: Response, next: NextFunction) => {
   })
   .catch(err=>{
     // console.log(err);
-    next(new ServerError("Ошибка сервера"));
+    return next(new ServerError("Ошибка сервера"));
   })
 }
 
 export const getUser = (req: Request, res: Response, next: NextFunction) => {
   const authorization = req.headers.authorization;
-  // console.log(authorization);
+  // console.log("getUser: " + authorization);
   const token = authorization!.split(' ')[1];
 
   return user.findOne({
@@ -148,7 +150,7 @@ export const getUser = (req: Request, res: Response, next: NextFunction) => {
   .then(user=>{
     // console.log(user);
     if(!user)
-      next(new NotFoundError("Пользователь не найден"));
+      return next(new NotFoundError("Пользователь не найден"));
     res.status(200).send({
       user:{
         email: user?.email,

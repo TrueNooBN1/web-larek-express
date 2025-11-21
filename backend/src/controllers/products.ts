@@ -65,7 +65,7 @@ export const patchProduct = (req: Request, res: Response, next: NextFunction) =>
     .then(()=>{
     })
     .catch(err=>{
-      next(new BadRequestError("Incorrect fileName"))
+      return next(new BadRequestError("Incorrect fileName"))
     })
   }
   product.findByIdAndUpdate({_id: productId},body,{new: true})
