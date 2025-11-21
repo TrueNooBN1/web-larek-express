@@ -7,7 +7,7 @@ import { auth } from '../middlewares/auth';
 const productsRouter = Router();
 
 productsRouter.get('/', getProducts);
-productsRouter.post('/', auth, postProduct);
+productsRouter.post('/', postProduct);
 productsRouter.patch('/:productId', auth, patchProduct);
 productsRouter.delete('/:productId', auth, deleteProduct);
 
