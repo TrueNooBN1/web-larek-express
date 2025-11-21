@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import ServerError from '../errors/server-error';
 import path from 'path';
+import fs from 'fs/promises';
+import ServerError from '../errors/server-error';
 
-const fs = require('fs');
-
-export const uploadFile = async (req: Request, res: Response, next: NextFunction) => {
+const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   if (!req.file) {
     return next(new ServerError('No file uploaded'));
   }
@@ -12,16 +11,15 @@ export const uploadFile = async (req: Request, res: Response, next: NextFunction
   const extension = path.extname(req.file.originalname);
 
   const basePath = path.join(req.file.destination, req.file.filename);
-  const relativePath = "/temp/"+ req.file.filename + extension;
-  
-  await fs.rename(basePath, basePath + extension, (error:Error, res: Response, req: Request)=>{
-    if(error)
-      return next(new ServerError("file rename error"));
+  const relativePath = `/temp/${req.file.filename}${extension}`;
+  const fileName = req.file.filename;
 
-  })
-  
-  res.status(200).send({
-    fileName: relativePath,
-    originalName: req.file.filename + extension
-  });
+  return fs.rename(basePath, basePath + extension)
+    .then(() => res.status(200).send({
+      fileName: relativePath,
+      originalName: fileName + extension,
+    }))
+    .catch(() => next(new ServerError('file rename error')));
 };
+
+export default uploadFile;

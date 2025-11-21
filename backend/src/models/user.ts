@@ -1,5 +1,4 @@
-import { fa } from "@faker-js/faker/.";
-import mongoose, { Model, Document, Types} from "mongoose";
+import mongoose, { Types } from 'mongoose';
 
 export interface IToken{
   token: string;
@@ -17,33 +16,33 @@ export type IDBUser = IUser & {
 }
 
 const tokenSchema = new mongoose.Schema<IToken>({
-  token:{
+  token: {
     type: String,
     required: [true, 'Поле token должно быть заполнено'],
   },
 });
 
 const userSchema = new mongoose.Schema<IUser>({
- name: {
+  name: {
     type: String,
     minlength: [2, 'Минимальная длина поля name - 2'],
     maxlength: [30, 'Максимальная длина поля name - 30'],
-    default: "Ё-моё"  
-  }, 
-  email:{
+    default: 'Ё-моё',
+  },
+  email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
-  password:{
+  password: {
     type: String,
     minlength: [6, 'Минимальная длина поля password - 6'],
     required: true,
-    select: false
+    select: false,
   },
   tokens: [tokenSchema],
 });
 
 userSchema.index({ email: 1 }, { unique: true });
 
-export default mongoose.model<IUser>('user', userSchema); 
+export default mongoose.model<IUser>('user', userSchema);

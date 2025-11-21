@@ -1,12 +1,12 @@
-import mongoose from "mongoose";
-import fs from "fs/promises"
+import mongoose from 'mongoose';
+import fs from 'fs/promises';
 
 // enum Categories{
 //   "главное",
 //   "неглавное"
 // }
 
-const path = require('path')
+const path = require('path');
 
 export interface IImage{
   fileName: string;
@@ -22,56 +22,54 @@ export interface IProduct{
 }
 
 const imageSchema = new mongoose.Schema<IImage>({
-  fileName:{
+  fileName: {
     type: String,
     required: [true, 'Поле fileName должно быть заполнено'],
   },
-  originalName:{
+  originalName: {
     type: String,
     required: [true, 'Поле originalName должно быть заполнено'],
-  }
+  },
 });
 
 const productSchema = new mongoose.Schema<IProduct>({
- title: {
+  title: {
     type: String,
     unique: true,
     required: [true, 'Поле "title" должно быть заполнено'],
     minlength: [2, 'Минимальная длина поля "title" - 2'],
     maxlength: [30, 'Максимальная длина поля "title" - 30'],
-  }, 
+  },
   image: imageSchema,
-  category:{
+  category: {
     type: String,
     required: false,
   },
-  description:{
+  description: {
     type: String,
     required: false,
   },
-  price:{
+  price: {
     type: Number,
     required: false,
-  }
+  },
 });
 
-const deleteProductFiles = (product: IProduct)=> {
-  const filesToDelete: string[] = [];
-
+const deleteProductFiles = (product: IProduct) => {
   if (!product.image.fileName) {
     return;
   }
-  
+
   const fullPath = path.join(__dirname, '../public', product.image.fileName);
-  console.log(fullPath);
+  // console.log(fullPath);
   fs.unlink(fullPath)
-  .then(()=>{
-  })
-  .catch ((err)=>{
-  })
+    .then(() => {
+    })
+    .catch(() => {
+    });
 };
 
-productSchema.post('findOneAndDelete', async function(product: IProduct) {
+productSchema.post('findOneAndDelete', async (product: IProduct) => {
   if (product) {
     await deleteProductFiles(product);
   }
@@ -79,5 +77,4 @@ productSchema.post('findOneAndDelete', async function(product: IProduct) {
 
 productSchema.index({ title: 1 }, { unique: true });
 
-
-export default mongoose.model<IProduct>('product', productSchema); 
+export default mongoose.model<IProduct>('product', productSchema);

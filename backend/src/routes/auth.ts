@@ -1,13 +1,15 @@
-import { auth } from "../middlewares/auth";
-import { getToken, getUser, login, logout, register } from "../controllers/auth";
-import { Router } from "express";
+import { Router } from 'express';
+import { auth } from '../middlewares/auth';
+import {
+  getToken, getUser, login, logout, register,
+} from '../controllers/auth';
 
-const router = Router();
+const authRouter = Router();
 
-router.post('/login', login);
-router.post('/register', register);
-router.get('/token', getToken);
-router.get('/logout', logout);
-router.get('/user', auth, getUser);
+authRouter.post('/login', login);
+authRouter.post('/register', register);
+authRouter.get('/token', getToken);
+authRouter.get('/logout', logout);
+authRouter.get('/user', auth, getUser);
 
-export {router as authRouter};
+export default authRouter;

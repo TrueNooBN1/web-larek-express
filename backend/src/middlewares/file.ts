@@ -1,15 +1,12 @@
-import BadRequestError from "../errors/bad-request-error";
-import { uploadPath } from "../config";
-import { Request, Response, NextFunction } from "express"
-import multer from "multer"
-
-const path = require('path');
-const fs = require('fs');
+import { Request, Express } from 'express';
+import multer from 'multer';
+import BadRequestError from '../errors/bad-request-error';
+import { uploadPath } from '../config';
 
 const fileFilter = (
-  req: Request, 
-  file: Express.Multer.File, 
-  cb: multer.FileFilterCallback
+  _req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback,
 ) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -18,10 +15,12 @@ const fileFilter = (
   }
 };
 
-export const fileMiddleware = multer({
+const fileMiddleware = multer({
   dest: uploadPath,
   limits: {
-    fileSize: 10 * 1024 * 1024
+    fileSize: 10 * 1024 * 1024,
   },
-  fileFilter: fileFilter
+  fileFilter,
 });
+
+export default fileMiddleware;

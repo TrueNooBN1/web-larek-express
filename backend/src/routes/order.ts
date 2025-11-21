@@ -1,14 +1,14 @@
-import { Router } from "express";
-import { postOrder } from "../controllers/order";
-import { celebrate, Segments } from "celebrate";
-import { orderSchema } from "../middlewares/validators";
+import { Router } from 'express';
+import { celebrate, Segments } from 'celebrate';
+import postOrder from '../controllers/order';
+import { orderSchema } from '../middlewares/validators';
 
-const router = Router();
+const orderRouter = Router();
 
 const orderRouteValidator = celebrate({
-  [Segments.BODY] : orderSchema
+  [Segments.BODY]: orderSchema,
 });
 
-router.post('/', orderRouteValidator, postOrder);
+orderRouter.post('/', orderRouteValidator, postOrder);
 
-export {router as orderRouter};
+export default orderRouter;
