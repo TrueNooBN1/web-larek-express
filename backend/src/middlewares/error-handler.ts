@@ -21,7 +21,7 @@ const errorHandler = (
     || error instanceof UnauthorizedError) {
     return res.status(error.statusCode).send({ message: error.message });
   }
-  return res.status(404).send('');
+  return res.status(500).send('');
 };
 
 export default errorHandler;

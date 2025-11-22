@@ -17,7 +17,7 @@ export const getProducts = (_req: Request, res: Response, next: NextFunction) =>
 export const postProduct = (req: Request, res: Response, next: NextFunction) => {
   const { body } = req;
   const newProduct : IProduct = body;
-  console.log(newProduct);
+  // console.log(newProduct);
 
   if (newProduct === undefined || newProduct === null) { return next(new BadRequestError('product required in body')); }
 
@@ -43,7 +43,7 @@ export const postProduct = (req: Request, res: Response, next: NextFunction) => 
       if (err.code === 11000) {
         return next(new ConflictError('Продукт с таким названием уже есть в системе'));
       }
-      console.log(err);
+      // console.log(err);
       return next(new BadRequestError('Переданы некорректные данные при создании товара'));
     });
 };
@@ -65,7 +65,7 @@ export const patchProduct = (req: Request, res: Response, next: NextFunction) =>
   }
   return product.findByIdAndUpdate({ _id: productId }, body, { new: true })
     .then(() => {
-      res.status(201).send({ ...product, _id: productId });
+      res.status(200).send({ ...product, _id: productId });
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -80,6 +80,7 @@ export const deleteProduct = (req: Request, res: Response, next: NextFunction) =
   return product.findOneAndDelete({ _id: productId })
     .then(() => {
       if (!product) { return next(new BadRequestError('Продукт не найден')); }
-      return res.status(201).send(product);
-    });
+      return res.status(200).send(product);
+    })
+    .catch(() => next(new ServerError('Ошибка сервера')));
 };

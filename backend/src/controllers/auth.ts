@@ -52,7 +52,7 @@ export const register = (req: Request, res: Response, next: NextFunction) => {
         findedUser.set('tokens', [accessToken, refreshToken]);
         findedUser.save()
           .then(() => {
-            res.status(200).send({
+            res.status(201).send({
               user: {
                 email: findedUser.email,
                 name: findedUser.name,
